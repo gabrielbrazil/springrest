@@ -1,0 +1,132 @@
+package com.springangular.main;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.util.Arrays;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertNull;
+
+import com.springangular.errors.ProdutoNotFoundException;
+import com.springangular.util.TestUtil;
+import com.springrest.controller.ProdutoController;
+import com.springrest.model.Produto;
+import com.springrest.repository.ProdutoRepository;
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(ProdutoController.class)
+public class TesteProduto {
+
+	@Autowired
+	private MockMvc mockMvc;
+	@MockBean
+	private ProdutoRepository produtoRepository;
+	
+	@Test
+	public void allProdutos() throws Exception {
+		Produto produto = new Produto();
+		produto.setId(1L);
+		produto.setNome("Caderno");
+		produto.setPreco("25.5");
+		
+		
+		Produto produto2 = new Produto();
+		produto2.setId(2L);
+		produto2.setNome("Lapis");
+		produto2.setPreco("25.5");
+		
+		Mockito.when(produtoRepository.findAll()).thenReturn(Arrays.asList(produto,produto2));
+		
+		mockMvc.perform(get("/produtos"))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+		.andExpect(jsonPath("$",hasSize(2)))
+		.andExpect(jsonPath("$[0].id",is(1)))
+		.andExpect(jsonPath("$[1].id",is(2)));
+		
+		verify(produtoRepository,times(1)).findAll();
+		verifyNoMoreInteractions(produtoRepository);
+		
+	}
+	
+	
+	
+	@Test
+    public void findById_TodoEntryNotFound_ShouldReturnHttpStatusCode404() throws Exception {
+        when(produtoRepository.findOne(1L)).thenThrow(new ProdutoNotFoundException(""));
+ 
+        mockMvc.perform(get("/produtos/{id}", 1L))
+                .andExpect(status().isNotFound());
+ 
+        verify(produtoRepository, times(1)).findOne(1L);
+        verifyNoMoreInteractions(produtoRepository);
+    }
+	
+	
+	
+	@Test
+	public void findByIdRest() throws Exception {
+		Produto produto = new Produto();
+		produto.setId(1L);
+		produto.setNome("Caderno");
+		produto.setPreco("25.5");
+		
+		Mockito.when(produtoRepository.findOne(1L)).thenReturn(produto);
+		
+		mockMvc.perform(get("/produtos/{id}",1L)).andExpect(status().isOk())
+		 .andExpect(jsonPath("$.id", is(1)))
+		 .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+         .andExpect(jsonPath("$.nome", is("Caderno")))
+         .andExpect(jsonPath("$.preco", is("25.5")));
+		
+		verify(produtoRepository, times(1)).findOne(1L);
+		verifyNoMoreInteractions(produtoRepository);
+	}
+	
+	
+	@Test
+	public void addNewTest() throws IOException, Exception{
+		Produto produto = new Produto();
+//		produto.setId(1L);
+		produto.setNome("Caderno");
+		produto.setPreco("25.5");
+		
+		
+		when(produtoRepository.save(produto)).thenReturn(produto);
+		mockMvc.perform(post("/produtos")
+		.contentType(TestUtil.APPLICATION_JSON_UTF8)
+		.content(TestUtil.convertObjectToJsonBytes(produto))
+		)
+		.andExpect(status().isOk())
+//		.andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+		.andExpect(jsonPath("$.id", is(1)));
+		
+		 ArgumentCaptor<Produto> dtoCaptor = ArgumentCaptor.forClass(Produto.class);
+	        verify(produtoRepository, times(1)).save(dtoCaptor.capture());
+	        verifyNoMoreInteractions(produtoRepository);
+	 
+	        Produto dtoArgument = dtoCaptor.getValue();
+	        
+	        assertNull(dtoArgument.getId());
+	}
+	
+}
