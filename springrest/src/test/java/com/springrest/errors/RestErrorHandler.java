@@ -1,4 +1,4 @@
-package com.springangular.errors;
+package com.springrest.errors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

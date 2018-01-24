@@ -1,4 +1,4 @@
-package com.springangular.util;
+package com.springrest.util;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

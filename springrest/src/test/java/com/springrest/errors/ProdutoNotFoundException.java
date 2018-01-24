@@ -1,4 +1,4 @@
-package com.springangular.errors;
+package com.springrest.errors;
 
 
 public class ProdutoNotFoundException extends RuntimeException {

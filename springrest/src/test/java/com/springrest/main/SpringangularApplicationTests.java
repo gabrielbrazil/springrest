@@ -1,4 +1,4 @@
-package com.springangular.main;
+package com.springrest.main;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package com.springangular.main;
+package com.springrest.main;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.times;
@@ -26,11 +26,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNull;
 
-import com.springangular.errors.ProdutoNotFoundException;
-import com.springangular.util.TestUtil;
 import com.springrest.controller.ProdutoController;
+import com.springrest.errors.ProdutoNotFoundException;
 import com.springrest.model.Produto;
 import com.springrest.repository.ProdutoRepository;
+import com.springrest.util.TestUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(ProdutoController.class)
