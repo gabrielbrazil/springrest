@@ -133,7 +133,7 @@ public class TesteProduto {
 	        Produto dtoArgument = dtoCaptor.getValue();
 	        
 	        assertNull(dtoArgument.getId());
-	        assertThat(dtoArgument.getNome(),is("caderno"));
+	        assertThat(dtoArgument.getNome(),is("Caderno"));
 	        assertThat(dtoArgument.getPreco(),is("25.5"));
 	}
 	
