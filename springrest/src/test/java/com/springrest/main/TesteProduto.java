@@ -1,6 +1,7 @@
 package com.springrest.main;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -25,6 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import com.springrest.controller.ProdutoController;
 import com.springrest.errors.ProdutoNotFoundException;
@@ -106,18 +108,22 @@ public class TesteProduto {
 	@Test
 	public void addNewTest() throws IOException, Exception{
 		Produto produto = new Produto();
-//		produto.setId(1L);
 		produto.setNome("Caderno");
 		produto.setPreco("25.5");
 		
+		Produto produtoTeste = new Produto();
+		produtoTeste.setId(1L);
+		produtoTeste.setNome("Caderno");
+		produtoTeste.setPreco("25.5");
 		
-		when(produtoRepository.save(produto)).thenReturn(produto);
+		
+		when(produtoRepository.save(any(Produto.class))).thenReturn(produtoTeste);
 		mockMvc.perform(post("/produtos")
 		.contentType(TestUtil.APPLICATION_JSON_UTF8)
 		.content(TestUtil.convertObjectToJsonBytes(produto))
 		)
 		.andExpect(status().isOk())
-//		.andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+		.andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
 		.andExpect(jsonPath("$.id", is(1)));
 		
 		 ArgumentCaptor<Produto> dtoCaptor = ArgumentCaptor.forClass(Produto.class);
@@ -127,6 +133,8 @@ public class TesteProduto {
 	        Produto dtoArgument = dtoCaptor.getValue();
 	        
 	        assertNull(dtoArgument.getId());
+	        assertThat(dtoArgument.getNome(),is("caderno"));
+	        assertThat(dtoArgument.getPreco(),is("25.5"));
 	}
 	
 }

@@ -41,7 +41,8 @@ public class ProdutoController {
 	
 	
 	@PostMapping
-	@ResponseStatus(HttpStatus.OK)
+//	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
 	public Produto create(@RequestBody Produto produto) {
 		return produtoRepository.save(produto);
 	}
