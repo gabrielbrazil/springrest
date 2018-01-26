@@ -1,19 +1,27 @@
 package com.springrest.main;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
 import java.util.Arrays;
+
+import javax.net.ssl.SSLEngineResult.Status;
+import javax.print.attribute.standard.Media;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,11 +30,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import com.springrest.controller.ProdutoController;
 import com.springrest.errors.ProdutoNotFoundException;
@@ -122,7 +128,7 @@ public class TesteProduto {
 		.contentType(TestUtil.APPLICATION_JSON_UTF8)
 		.content(TestUtil.convertObjectToJsonBytes(produto))
 		)
-		.andExpect(status().isOk())
+		.andExpect(status().isCreated())
 		.andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
 		.andExpect(jsonPath("$.id", is(1)));
 		
@@ -135,6 +141,34 @@ public class TesteProduto {
 	        assertNull(dtoArgument.getId());
 	        assertThat(dtoArgument.getNome(),is("Caderno"));
 	        assertThat(dtoArgument.getPreco(),is("25.5"));
+	}
+	
+	
+	@Test
+	public void deleteTest() throws IOException, Exception{
+		mockMvc.perform(delete("/produtos/1")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+		
+		verify(produtoRepository, times(1)).delete(1L);
+		verifyNoMoreInteractions(produtoRepository);
+	}
+	
+	@Test
+	public void updateTest() throws Exception {
+		Produto produto = new Produto();
+		produto.setId(1L);
+		produto.setNome("borracha atual");
+		produto.setPreco("20");
+		
+		when(produtoRepository.save(any(Produto.class))).thenReturn(produto);
+		
+		mockMvc.perform(put("/produto/{id}",1L)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(TestUtil.convertObjectToJsonBytes(produto)))
+				.andExpect(status().isOk());
+		
 	}
 	
 }

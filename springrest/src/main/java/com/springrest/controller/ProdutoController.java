@@ -41,7 +41,7 @@ public class ProdutoController {
 	
 	
 	@PostMapping
-//	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
 	public Produto create(@RequestBody Produto produto) {
 		return produtoRepository.save(produto);
@@ -49,8 +49,9 @@ public class ProdutoController {
 	
 	@PutMapping(value="/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public void update(@PathVariable("id")Long id,@RequestBody Produto produto) {
-		produtoRepository.save(produto);
+	@ResponseBody
+	public Produto update(@PathVariable("id")Long id,@RequestBody Produto produto) {
+		return produtoRepository.save(produto);
 	}
 	
 	@DeleteMapping(value="/{id}")
