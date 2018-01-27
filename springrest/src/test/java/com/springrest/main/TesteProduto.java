@@ -20,9 +20,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.net.ssl.SSLEngineResult.Status;
-import javax.print.attribute.standard.Media;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -122,6 +119,7 @@ public class TesteProduto {
 		produtoTeste.setNome("Caderno");
 		produtoTeste.setPreco("25.5");
 		
+		
 		when(produtoRepository.save(any(Produto.class))).thenReturn(produtoTeste);
 		mockMvc.perform(post("/produtos")
 		.contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -132,15 +130,16 @@ public class TesteProduto {
 		.andExpect(jsonPath("$.id", is(1)));
 		
 		 ArgumentCaptor<Produto> dtoCaptor = ArgumentCaptor.forClass(Produto.class);
-        verify(produtoRepository, times(1)).save(dtoCaptor.capture());
-        verifyNoMoreInteractions(produtoRepository);
- 
-        Produto dtoArgument = dtoCaptor.getValue();
-        
-        assertNull(dtoArgument.getId());
-        assertThat(dtoArgument.getNome(),is("Caderno"));
-        assertThat(dtoArgument.getPreco(),is("25.5"));
+	        verify(produtoRepository, times(1)).save(dtoCaptor.capture());
+	        verifyNoMoreInteractions(produtoRepository);
+	 
+	        Produto dtoArgument = dtoCaptor.getValue();
+	        
+	        assertNull(dtoArgument.getId());
+	        assertThat(dtoArgument.getNome(),is("Caderno"));
+	        assertThat(dtoArgument.getPreco(),is("25.5"));
 	}
+	
 	
 	@Test
 	public void deleteTest() throws IOException, Exception{
