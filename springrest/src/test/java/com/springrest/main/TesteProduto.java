@@ -3,6 +3,7 @@ package com.springrest.main;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
@@ -47,7 +48,7 @@ public class TesteProduto {
 	private ProdutoRepository produtoRepository;
 	
 	@Test
-	public void allProdutos() throws Exception {
+	public void findallTest() throws Exception {
 		Produto produto = new Produto();
 		produto.setId(1L);
 		produto.setNome("Caderno");
@@ -76,7 +77,7 @@ public class TesteProduto {
 	
 	
 	@Test
-    public void findById_TodoEntryNotFound_ShouldReturnHttpStatusCode404() throws Exception {
+    public void findById_ShouldReturnHttpStatusCode404() throws Exception {
         when(produtoRepository.findOne(1L)).thenThrow(new ProdutoNotFoundException(""));
  
         mockMvc.perform(get("/produtos/{id}", 1L))
@@ -89,7 +90,7 @@ public class TesteProduto {
 	
 	
 	@Test
-	public void findByIdRest() throws Exception {
+	public void findByIdTest() throws Exception {
 		Produto produto = new Produto();
 		produto.setId(1L);
 		produto.setNome("Caderno");
@@ -109,7 +110,7 @@ public class TesteProduto {
 	
 	
 	@Test
-	public void addNewTest() throws IOException, Exception{
+	public void addTest() throws IOException, Exception{
 		Produto produto = new Produto();
 		produto.setNome("Caderno");
 		produto.setPreco("25.5");
@@ -133,11 +134,11 @@ public class TesteProduto {
 	        verify(produtoRepository, times(1)).save(dtoCaptor.capture());
 	        verifyNoMoreInteractions(produtoRepository);
 	 
-	        Produto dtoArgument = dtoCaptor.getValue();
+	        Produto productArgument = dtoCaptor.getValue();
 	        
-	        assertNull(dtoArgument.getId());
-	        assertThat(dtoArgument.getNome(),is("Caderno"));
-	        assertThat(dtoArgument.getPreco(),is("25.5"));
+	        assertNull(productArgument.getId());
+	        assertThat(productArgument.getNome(),is("Caderno"));
+	        assertThat(productArgument.getPreco(),is("25.5"));
 	}
 	
 	
@@ -161,10 +162,22 @@ public class TesteProduto {
 		
 		when(produtoRepository.save(any(Produto.class))).thenReturn(produto);
 		
-		mockMvc.perform(put("/produto/{id}",1L)
+		mockMvc.perform(put("/produtos/{id}",1L)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(TestUtil.convertObjectToJsonBytes(produto)))
-				.andExpect(status().isOk());
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(1)));
+		
+		 
+		ArgumentCaptor<Produto> dtoCaptor = ArgumentCaptor.forClass(Produto.class);
+	        verify(produtoRepository, times(1)).save(dtoCaptor.capture());
+	        verifyNoMoreInteractions(produtoRepository);
+	 
+	        Produto productArgument = dtoCaptor.getValue();
+	        
+	        assertNotNull(productArgument.getId());
+	        assertThat(productArgument.getNome(),is("borracha atual"));
+	        assertThat(productArgument.getPreco(),is("20"));
 		
 	}
 	
